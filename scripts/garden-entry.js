@@ -7,7 +7,7 @@ import "@johnlindquist/kit";
 const GITHUB_TOKEN = await env("GITHUB_TOKEN");
 const GITHUB_OWNER = await env("GITHUB_OWNER");
 const GARDEN_REPO = await env("GARDEN_REPO");
-const filenamify = await npm("filenamify");
+const slugify = await npm("@sindresorhus/slugify");
 const dateFns = await npm("date-fns");
 
 const title = await arg("What do you want to name this seedling?");
@@ -16,17 +16,18 @@ const area = await arg("What area of the garden?", [
   "Code",
   "Flying",
   "Recipes",
-  "Hiking",
+  "Hikes",
   "Family",
 ]);
 
-const filename = filenamify(`${title}.md`.toLowerCase().replace(/ /g, "-"));
+const filename = `${slugify(title)}.md`;
 const today = dateFns.format(new Date(), "yyyy-MM-dd");
 
 const md = `---
 title: ${title}
 created: ${today}
 category: ${area.toLowerCase()}
+url: /${slugify(area)}/${slugify(title)}
 ---
 ${seedling}
 `;

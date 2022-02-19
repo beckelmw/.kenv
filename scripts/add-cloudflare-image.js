@@ -81,7 +81,7 @@ const markdown = uploads.map(({ name, result, latitude, longitude }) => {
       : `${name}`;
   const url = result.variants.find((x) => new RegExp(`${variant}$`).test(x));
 
-  return `![${alt}](${url})`;
+  return `- ![${alt}](${url})`;
 });
 
 await copy(markdown.join("\n"));
@@ -89,6 +89,6 @@ setHint(`Markdown copied to clipboard!`);
 show(
   `<main style="padding:8px">
     <h1>Markdown copied to clipboard!</h1>
-    ${markdown.map((i) => `<div>- ${i}</div>`).join("\n")}
+    ${markdown.map((i) => `<div>${i}</div>`).join("\n")}
   </main>`
 );

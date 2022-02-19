@@ -1,4 +1,5 @@
 import "@johnlindquist/kit";
+import githubUpload from "../lib/github-upload.js";
 
 const { gpx } = await npm("@tmcw/togeojson");
 const { DOMParser } = await npm("xmldom");
@@ -66,11 +67,9 @@ const geoJson = mergeGeoJson(geoJsonFiles);
 // Note: Tolerance could be a made a script choice
 const simplifiedGeoJson = simplify(geoJson, 0.0001);
 
-//Write back to the same directory with a different extension
-await writeJson(
-  path.join(path.dirname(selectedFiles[0]), "hike.geojson"),
-  simplifiedGeoJson,
-  {
-    flag: "w",
-  }
-);
+const filePath = `hikes/${path.basename(
+  path.dirname(selectedFiles[0])
+)}.geojson`;
+
+const { content } = await githubUpload(filePath, JSON.stringify(simplifiedGeoJson));
+await $`open ${content.html_url}`;
