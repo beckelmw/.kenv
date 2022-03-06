@@ -58,7 +58,13 @@ for (const file of selectedFiles.filter((f) => path.extname(f) !== ".gpx")) {
 }
 
 if (points.length) {
-  geoJsonFiles.push(buildPointsGeoJson(points, (x) => ({ name: x.name })));
+  geoJsonFiles.push(
+    buildPointsGeoJson(points, (x) => ({
+      name: x.name,
+      latitude: x.latitude,
+      longitude: x.longitude,
+    }))
+  );
 }
 
 const geoJson = mergeGeoJson(geoJsonFiles);
@@ -71,5 +77,8 @@ const filePath = `hikes/${path.basename(
   path.dirname(selectedFiles[0])
 )}.geojson`;
 
-const { content } = await githubUpload(filePath, JSON.stringify(simplifiedGeoJson));
+const { content } = await githubUpload(
+  filePath,
+  JSON.stringify(simplifiedGeoJson)
+);
 await $`open ${content.html_url}`;

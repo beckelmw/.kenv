@@ -4,14 +4,12 @@
 // Shortcut: command option r
 // Twitter: @beckelmw
 
-const dateFns = await npm("date-fns");
-const filenamify = await npm("filenamify");
-const prettier = await npm("prettier");
+import "@johnlindquist/kit";
+import githubUpload from "../lib/github-upload.js";
 
-const recipeDirectory = await env(
-  "RECIPE_DIRECTORY",
-  `Where do you want your recipes to be saved?`
-);
+const dateFns = await npm("date-fns");
+const prettier = await npm("prettier");
+const slugify = await npm("@sindresorhus/slugify");
 
 const ingredients = await textarea({ placeholder: "Ingredients" });
 const instructions = await textarea({ placeholder: "Instructions" });
@@ -21,6 +19,11 @@ const today = dateFns.format(new Date(), "yyyy-MM-dd");
 const title = await arg({
   placeholder: "What do you want to name this recipe?",
   hint: "Liver and onions",
+});
+
+const cuisine = await arg({
+  placeholder: "What cuisine is this recipe?",
+  hint: "Mexican",
 });
 
 function createList(txt) {
@@ -33,6 +36,7 @@ function createList(txt) {
 const md = `---
 title: ${title}
 date: ${today}
+cuisine: ${cuisine}
 ---
 ${introduction}
 
@@ -67,8 +71,7 @@ const prettyMd = await prettier.format(md, {
   vueIndentScriptAndStyle: false,
 });
 
-const filename = filenamify(`${title.toLowerCase().replace(/ /g, "-")}.md`, {
-  replacement: "-",
-});
+const filename = `${slugify(title)}.md`;
 
-await writeFile(path.join(recipeDirectory, filename), prettyMd);
+const { content } = await githubUpload(filename, prettyMd);
+await $`open ${content.html_url}`;
