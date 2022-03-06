@@ -33,10 +33,13 @@ function createList(txt) {
     .join("\n");
 }
 
+const filename = `${slugify(title)}.md`;
+
 const md = `---
 title: ${title}
 date: ${today}
 cuisine: ${cuisine}
+url: /recipes/${filename}
 ---
 ${introduction}
 
@@ -71,7 +74,5 @@ const prettyMd = await prettier.format(md, {
   vueIndentScriptAndStyle: false,
 });
 
-const filename = `${slugify(title)}.md`;
-
-const { content } = await githubUpload(filename, prettyMd);
+const { content } = await githubUpload(`recipes/${filename}`, prettyMd);
 await $`open ${content.html_url}`;
